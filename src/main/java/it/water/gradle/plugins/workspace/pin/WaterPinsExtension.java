@@ -62,6 +62,7 @@ public class WaterPinsExtension {
     private final PinOutputContainer output = new PinOutputContainer();
     private final PinInputContainer input = new PinInputContainer();
     private final ModulePropertiesContainer properties = new ModulePropertiesContainer();
+    private final ModuleRegistryContainer registry = new ModuleRegistryContainer();
     private final List<Project> inheritsFromProjects = new ArrayList<>();
 
     public void output(Action<PinOutputContainer> action) {
@@ -74,6 +75,10 @@ public class WaterPinsExtension {
 
     public void properties(Action<ModulePropertiesContainer> action) {
         action.execute(properties);
+    }
+
+    public void registry(Action<ModuleRegistryContainer> action) {
+        action.execute(registry);
     }
 
     /**
@@ -97,6 +102,7 @@ public class WaterPinsExtension {
     public PinOutputContainer getOutput() { return output; }
     public PinInputContainer getInput() { return input; }
     public ModulePropertiesContainer getProperties() { return properties; }
+    public ModuleRegistryContainer getRegistry() { return registry; }
 
     public List<Project> getInheritsFromProjects() { return Collections.unmodifiableList(inheritsFromProjects); }
 }

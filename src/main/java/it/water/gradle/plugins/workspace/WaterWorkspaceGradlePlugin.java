@@ -21,6 +21,7 @@ import it.water.gradle.plugins.workspace.pin.GenerateWaterDescriptorTask;
 import it.water.gradle.plugins.workspace.pin.InputPinSpec;
 import it.water.gradle.plugins.workspace.pin.OutputPinSpec;
 import it.water.gradle.plugins.workspace.pin.PinPropertySpec;
+import it.water.gradle.plugins.workspace.pin.RegistryEntrySpec;
 import it.water.gradle.plugins.workspace.pin.WaterPinsExtension;
 import it.water.gradle.plugins.workspace.util.WaterGradleWorkspaceUtil;
 import org.gradle.BuildListener;
@@ -338,27 +339,31 @@ public class WaterWorkspaceGradlePlugin implements Plugin<Settings>, BuildListen
             return; // module has no waterDescriptor declaration — skip
         }
 
-        // Collect inherited PINs and properties first, then merge own declarations on top
+        // Collect inherited PINs, properties and registry entries first, then merge own declarations on top
         List<OutputPinSpec> outputPins = new ArrayList<>();
         List<InputPinSpec> inputPins = new ArrayList<>();
         List<PinPropertySpec> moduleProperties = new ArrayList<>();
+        List<RegistryEntrySpec> registryEntries = new ArrayList<>();
         for (Project parentProject : ext.getInheritsFromProjects()) {
             WaterPinsExtension parentExt = parentProject.getExtensions().findByType(WaterPinsExtension.class);
             if (parentExt != null) {
                 outputPins.addAll(parentExt.getOutput().getPins());
                 inputPins.addAll(parentExt.getInput().getPins());
                 moduleProperties.addAll(parentExt.getProperties().getProperties());
-                log.info("Project {} inherits {} output PIN(s), {} input PIN(s) and {} propert(y/ies) from {}",
+                registryEntries.addAll(parentExt.getRegistry().getEntries());
+                log.info("Project {} inherits {} output PIN(s), {} input PIN(s), {} propert(y/ies) and {} registry entr(y/ies) from {}",
                         project.getName(),
                         parentExt.getOutput().getPins().size(),
                         parentExt.getInput().getPins().size(),
                         parentExt.getProperties().getProperties().size(),
+                        parentExt.getRegistry().getEntries().size(),
                         parentProject.getName());
             }
         }
         outputPins.addAll(ext.getOutput().getPins());
         inputPins.addAll(ext.getInput().getPins());
         moduleProperties.addAll(ext.getProperties().getProperties());
+        registryEntries.addAll(ext.getRegistry().getEntries());
 
         String artifactId = project.getGroup() + ":" + project.getName() + ":" + project.getVersion();
         String fileName   = "water-descriptor.json";
@@ -370,7 +375,8 @@ public class WaterWorkspaceGradlePlugin implements Plugin<Settings>, BuildListen
                 ext.getDescription() != null ? ext.getDescription() : "",
                 outputPins,
                 inputPins,
-                moduleProperties);
+                moduleProperties,
+                registryEntries);
 
         TaskProvider<GenerateWaterDescriptorTask> genTask = project.getTasks()
                 .register("generateWaterDescriptor", GenerateWaterDescriptorTask.class, t -> {

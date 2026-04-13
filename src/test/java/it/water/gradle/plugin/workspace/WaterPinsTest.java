@@ -299,7 +299,7 @@ class WaterPinsTest {
     void buildDescriptorJsonContainsSchemaVersion() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "it.water:test-module:1.0", "it.water.test", "Test Module", "",
-                Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("\"schemaVersion\""));
         assertTrue(json.contains("\"1.0\""));
@@ -310,7 +310,7 @@ class WaterPinsTest {
     void buildDescriptorJsonContainsArtifactModuleAndDisplayName() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "it.water:test-module:3.0.0", "it.water.test", "My Test Module", "",
-                Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water:test-module:3.0.0"));
         assertTrue(json.contains("it.water.test"));
@@ -322,7 +322,7 @@ class WaterPinsTest {
     void buildDescriptorJsonWithEmptyPinsProducesOutputAndInputKeys() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
-                Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("\"output\""));
         assertTrue(json.contains("\"input\""));
@@ -336,7 +336,7 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
-                out.getPins(), Collections.emptyList(), Collections.emptyList());
+                out.getPins(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water.integration.authentication-issuer"));
         assertTrue(json.contains("water.authentication.service.issuer"));
@@ -351,7 +351,7 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
-                Collections.emptyList(), in.getPins(), Collections.emptyList());
+                Collections.emptyList(), in.getPins(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water.persistence.jdbc"));
         assertTrue(json.contains("it.water.api-gateway"));
@@ -370,11 +370,76 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
-                out.getPins(), Collections.emptyList(), Collections.emptyList());
+                out.getPins(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water.integration.custom"));
         assertTrue(json.contains("custom.property.key"));
         assertTrue(json.contains("custom-default"));
+    }
+
+    // =========================================================================
+    // ModuleRegistryContainer — DSL unit tests
+    // =========================================================================
+
+    @Test
+    @Order(70)
+    void registryContainerEntryAddsSpec() {
+        ModuleRegistryContainer container = new ModuleRegistryContainer();
+        container.entry("water.authentication.issuer", spec -> spec.setValue("water"));
+
+        List<RegistryEntrySpec> entries = container.getEntries();
+        assertEquals(1, entries.size());
+        assertEquals("water.authentication.issuer", entries.get(0).getKey());
+        assertEquals("water", entries.get(0).getValue());
+    }
+
+    @Test
+    @Order(71)
+    void registryContainerMultipleEntriesAreAllStored() {
+        ModuleRegistryContainer container = new ModuleRegistryContainer();
+        container.entry("key.one", spec -> spec.setValue("val1"));
+        container.entry("key.two", spec -> spec.setValue("val2"));
+
+        assertEquals(2, container.getEntries().size());
+        assertEquals("key.one",  container.getEntries().get(0).getKey());
+        assertEquals("key.two",  container.getEntries().get(1).getKey());
+        assertEquals("val2",     container.getEntries().get(1).getValue());
+    }
+
+    @Test
+    @Order(72)
+    void registryContainerGetEntriesReturnsUnmodifiableView() {
+        ModuleRegistryContainer container = new ModuleRegistryContainer();
+        container.entry("some.key", spec -> spec.setValue("v"));
+        assertThrows(UnsupportedOperationException.class,
+                () -> container.getEntries().add(new RegistryEntrySpec("extra")));
+    }
+
+    @Test
+    @Order(73)
+    void buildDescriptorJsonRegistryEntriesAppearInJson() {
+        ModuleRegistryContainer registry = new ModuleRegistryContainer();
+        registry.entry("water.authentication.issuer", spec -> spec.setValue("water"));
+
+        String json = GenerateWaterDescriptorTask.buildDescriptorJson(
+                "a:b:1", "it.water.m", "M", "",
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
+                registry.getEntries());
+
+        assertTrue(json.contains("\"registry\""),                   "JSON must contain registry section");
+        assertTrue(json.contains("water.authentication.issuer"),    "JSON must contain the registry key");
+        assertTrue(json.contains("\"water\""),                      "JSON must contain the registry value");
+    }
+
+    @Test
+    @Order(74)
+    void buildDescriptorJsonEmptyRegistryProducesEmptyArray() {
+        String json = GenerateWaterDescriptorTask.buildDescriptorJson(
+                "a:b:1", "it.water.m", "M", "",
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
+                Collections.emptyList());
+
+        assertTrue(json.contains("\"registry\""), "JSON must always contain the registry key");
     }
 
     // =========================================================================

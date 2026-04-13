@@ -75,7 +75,8 @@ public abstract class GenerateWaterDescriptorTask extends DefaultTask {
             String description,
             List<OutputPinSpec> outputPins,
             List<InputPinSpec> inputPins,
-            List<PinPropertySpec> moduleProperties) {
+            List<PinPropertySpec> moduleProperties,
+            List<RegistryEntrySpec> registryEntries) {
 
         Map<String, Object> descriptor = new LinkedHashMap<>();
         descriptor.put("schemaVersion", "1.0");
@@ -84,7 +85,8 @@ public abstract class GenerateWaterDescriptorTask extends DefaultTask {
         descriptor.put("displayName",   displayName);
         descriptor.put("description",   description);
 
-        descriptor.put("properties", buildModulePropertiesList(moduleProperties));
+        descriptor.put("registry",    buildRegistryList(registryEntries));
+        descriptor.put("properties",  buildModulePropertiesList(moduleProperties));
 
         Map<String, Object> pins = new LinkedHashMap<>();
         pins.put("output", buildOutputList(outputPins));
@@ -92,6 +94,17 @@ public abstract class GenerateWaterDescriptorTask extends DefaultTask {
         descriptor.put("pins", pins);
 
         return JsonOutput.prettyPrint(JsonOutput.toJson(descriptor));
+    }
+
+    private static List<Map<String, Object>> buildRegistryList(List<RegistryEntrySpec> registryEntries) {
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (RegistryEntrySpec entry : registryEntries) {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("key",   entry.getKey());
+            m.put("value", entry.getValue());
+            list.add(m);
+        }
+        return list;
     }
 
     private static List<Map<String, Object>> buildModulePropertiesList(List<PinPropertySpec> moduleProperties) {
