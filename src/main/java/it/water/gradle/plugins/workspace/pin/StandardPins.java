@@ -54,8 +54,10 @@ public class StandardPins {
     // -------------------------------------------------------------------------
 
     private static OutputPinSpec jdbc() {
-        OutputPinSpec p = new OutputPinSpec("it.water.persistence.jdbc");
+        OutputPinSpec p = new OutputPinSpec("it.water.data.persistence");
         p.setRequired(true);
+        p.addProperty("db.driver-class-name", "Driver Class Name", false, false, "", "JDBC driver class name (e.g. org.postgresql.Driver)");
+        p.addProperty("db.url",       "JDBC URL",         false, false, "",     "Full JDBC URL (e.g. jdbc:postgresql://host:5432/db)");
         p.addProperty("db.host",      "Host",             true,  false, "",     "Database hostname");
         p.addProperty("db.port",      "Port",             true,  false, "5432", "Database port");
         p.addProperty("db.username",  "Username",         true,  false, "",     "Database username");

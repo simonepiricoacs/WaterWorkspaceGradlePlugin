@@ -115,7 +115,7 @@ waterPins {
 
     output {
         // Standard PIN from the built-in catalog:
-        standardPin 'jdbc'               // expands to it.water.persistence.jdbc
+        standardPin 'jdbc'               // expands to it.water.data.persistence
 
         // Custom PIN with explicit property schema:
         pin('it.water.integration.authentication-issuer') {
@@ -147,7 +147,7 @@ Modules that declare no `waterPins.moduleId` are skipped silently — no task is
 
 | Shorthand | PIN id | Required |
 |-----------|--------|----------|
-| `jdbc` | `it.water.persistence.jdbc` | true |
+| `jdbc` | `it.water.data.persistence` | true |
 | `api-gateway` | `it.water.api-gateway` | false |
 | `service-discovery` | `it.water.service-discovery` | false |
 | `cluster-coordinator` | `it.water.cluster.coordinator` | false |
@@ -187,7 +187,7 @@ dependencies {
   "pins": {
     "output": [
       {
-        "id": "it.water.persistence.jdbc",
+        "id": "it.water.data.persistence",
         "required": true,
         "properties": [
           { "key": "db.host",     "required": true,  "sensitive": false, "defaultValue": "" },

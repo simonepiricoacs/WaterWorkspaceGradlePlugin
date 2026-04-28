@@ -123,11 +123,13 @@ class WaterPinsTest {
     @Order(14)
     void jdbcStandardPinHasCorrectIdAndProperties() {
         OutputPinSpec jdbc = StandardPins.get("jdbc");
-        assertEquals("it.water.persistence.jdbc", jdbc.getId());
+        assertEquals("it.water.data.persistence", jdbc.getId());
         assertTrue(jdbc.isRequired());
         assertFalse(jdbc.getProperties().isEmpty());
 
         List<PinPropertySpec> props = jdbc.getProperties();
+        assertTrue(props.stream().anyMatch(p -> "db.driver-class-name".equals(p.getKey())));
+        assertTrue(props.stream().anyMatch(p -> "db.url".equals(p.getKey())));
         assertTrue(props.stream().anyMatch(p -> "db.host".equals(p.getKey())));
         assertTrue(props.stream().anyMatch(p -> "db.password".equals(p.getKey()) && p.isSensitive()));
     }
@@ -179,7 +181,7 @@ class WaterPinsTest {
         container.standardPin("jdbc");
 
         assertEquals(1, container.getPins().size());
-        assertEquals("it.water.persistence.jdbc", container.getPins().get(0).getId());
+        assertEquals("it.water.data.persistence", container.getPins().get(0).getId());
         assertFalse(container.getPins().get(0).getProperties().isEmpty());
     }
 
@@ -299,6 +301,7 @@ class WaterPinsTest {
     void buildDescriptorJsonContainsSchemaVersion() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "it.water:test-module:1.0", "it.water.test", "Test Module", "",
+                null, null, null,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("\"schemaVersion\""));
@@ -310,6 +313,7 @@ class WaterPinsTest {
     void buildDescriptorJsonContainsArtifactModuleAndDisplayName() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "it.water:test-module:3.0.0", "it.water.test", "My Test Module", "",
+                null, null, null,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water:test-module:3.0.0"));
@@ -322,6 +326,7 @@ class WaterPinsTest {
     void buildDescriptorJsonWithEmptyPinsProducesOutputAndInputKeys() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
+                null, null, null,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("\"output\""));
@@ -336,6 +341,7 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
+                null, null, null,
                 out.getPins(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water.integration.authentication-issuer"));
@@ -351,9 +357,10 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
+                null, null, null,
                 Collections.emptyList(), in.getPins(), Collections.emptyList(), Collections.emptyList());
 
-        assertTrue(json.contains("it.water.persistence.jdbc"));
+        assertTrue(json.contains("it.water.data.persistence"));
         assertTrue(json.contains("it.water.api-gateway"));
     }
 
@@ -370,6 +377,7 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
+                null, null, null,
                 out.getPins(), Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
 
         assertTrue(json.contains("it.water.integration.custom"));
@@ -423,6 +431,7 @@ class WaterPinsTest {
 
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
+                null, null, null,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
                 registry.getEntries());
 
@@ -436,6 +445,7 @@ class WaterPinsTest {
     void buildDescriptorJsonEmptyRegistryProducesEmptyArray() {
         String json = GenerateWaterDescriptorTask.buildDescriptorJson(
                 "a:b:1", "it.water.m", "M", "",
+                null, null, null,
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList(),
                 Collections.emptyList());
 
@@ -486,7 +496,7 @@ class WaterPinsTest {
         assertTrue(json.contains("schemaVersion"),            "JSON must contain schemaVersion");
         assertTrue(json.contains("it.water.test.module"),     "JSON must contain moduleId");
         assertTrue(json.contains("Test Module"),              "JSON must contain displayName");
-        assertTrue(json.contains("it.water.persistence.jdbc"),
+        assertTrue(json.contains("it.water.data.persistence"),
                 "JSON must contain the standardPin jdbc output");
         assertTrue(json.contains("it.water.integration.authentication-issuer"),
                 "JSON must contain the custom output pin");
@@ -628,7 +638,7 @@ class WaterPinsTest {
 
         String json = new String(Files.readAllBytes(jsonFiles[0].toPath()), StandardCharsets.UTF_8);
 
-        assertTrue(json.contains("it.water.persistence.jdbc"),
+        assertTrue(json.contains("it.water.data.persistence"),
                 "JSON must contain the input PIN (jdbc) inherited from the service module");
     }
 }

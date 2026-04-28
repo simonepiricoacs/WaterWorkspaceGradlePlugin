@@ -16,6 +16,7 @@ waterDescriptor {
     moduleId    = 'it.water.test.module'
     displayName = 'Test Module'
     description = 'Test module for PIN descriptor integration tests'
+    componentsPackage = 'it.water.test.service'
 
     output {
         standardPin 'jdbc'

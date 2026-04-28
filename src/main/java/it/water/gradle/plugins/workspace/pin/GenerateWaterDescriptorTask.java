@@ -73,6 +73,9 @@ public abstract class GenerateWaterDescriptorTask extends DefaultTask {
             String moduleId,
             String displayName,
             String description,
+            String componentsPackage,
+            String repositoryPackage,
+            String entitiesPackage,
             List<OutputPinSpec> outputPins,
             List<InputPinSpec> inputPins,
             List<PinPropertySpec> moduleProperties,
@@ -84,6 +87,9 @@ public abstract class GenerateWaterDescriptorTask extends DefaultTask {
         descriptor.put("moduleId",      moduleId);
         descriptor.put("displayName",   displayName);
         descriptor.put("description",   description);
+        descriptor.put("componentsPackage", componentsPackage != null ? componentsPackage : "");
+        descriptor.put("repositoryPackage", repositoryPackage != null ? repositoryPackage : "");
+        descriptor.put("entitiesPackage",   entitiesPackage   != null ? entitiesPackage   : "");
 
         descriptor.put("registry",    buildRegistryList(registryEntries));
         descriptor.put("properties",  buildModulePropertiesList(moduleProperties));

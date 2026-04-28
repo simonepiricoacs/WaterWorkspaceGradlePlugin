@@ -27,8 +27,11 @@ import java.util.List;
  *
  * <pre>
  * waterDescriptor {
- *     moduleId    = 'it.water.user'
- *     displayName = 'User Service'
+ *     moduleId           = 'it.water.user'
+ *     displayName        = 'User Service'
+ *     componentsPackage  = 'it.water.user.service'
+ *     repositoryPackage  = 'it.water.user.repository'
+ *     entitiesPackage    = 'it.water.user.model'
  *
  *     output {
  *         standardPin 'authentication-issuer'
@@ -59,6 +62,9 @@ public class WaterPinsExtension {
     private String moduleId;
     private String displayName;
     private String description;
+    private String componentsPackage;
+    private String repositoryPackage;
+    private String entitiesPackage;
     private final PinOutputContainer output = new PinOutputContainer();
     private final PinInputContainer input = new PinInputContainer();
     private final ModulePropertiesContainer properties = new ModulePropertiesContainer();
@@ -98,6 +104,15 @@ public class WaterPinsExtension {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getComponentsPackage() { return componentsPackage; }
+    public void setComponentsPackage(String componentsPackage) { this.componentsPackage = componentsPackage; }
+
+    public String getRepositoryPackage() { return repositoryPackage; }
+    public void setRepositoryPackage(String repositoryPackage) { this.repositoryPackage = repositoryPackage; }
+
+    public String getEntitiesPackage() { return entitiesPackage; }
+    public void setEntitiesPackage(String entitiesPackage) { this.entitiesPackage = entitiesPackage; }
 
     public PinOutputContainer getOutput() { return output; }
     public PinInputContainer getInput() { return input; }
